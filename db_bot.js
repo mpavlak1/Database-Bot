@@ -17,9 +17,13 @@ module.exports = {
 };
 var database = require('./database_functions.js');
 var censor = require('./CensorReader.js');
+var games = require('./game.js');
 
+
+botID = undefined
 bot.on('ready', function (evt) {
     console.log('Logged in as %s - %s\n', bot.username, bot.id);
+	botID = bot.id //used for slots, set botID on startup
 });
 
 /*
@@ -34,13 +38,14 @@ Function to mark the bot purpose is to send message while it is on
  * @param {int} channelID - the channel to send the message to
  * @param {function} evt - event to do something extra, a potential callback
  */
-bot.on('message', function (user, userID, channelID, message, evt) {
-	if(channelID == 408777732579917824){
+bot.on('message', function (user, userID, channelID, message, messageID, evt) {
+	if(channelID == 408777712661168129){ // //408777732579917824
+
 		// Our bot needs to know if it will execute a command
 		// It will listen for messages that will start with `!`
 		if (message.substring(0, 1) == '!') {
-			let args = message.substring(1).split(' ');
-			let cmd = args[0];
+			args = message.substring(1).split(' ');
+			cmd = args[0];
 			args = args.splice(1);
 			switch(cmd) {
 				case 'daily':
@@ -84,6 +89,24 @@ bot.on('message', function (user, userID, channelID, message, evt) {
                 case 't':
                     sendMessage(userID,channelID,":no_entry:");
                 break;
+                
+                case 'hangman':
+					bot.sendMessage({to: channelID, message: games.hangman(userID,args,channelID),});
+					break;
+				
+				case '2048':
+					bot.sendMessage({to: channelID, message: games.p2048(userID,args,channelID),});
+					break;
+				
+				case 'slots':
+					mid = messageID['d']['id']
+					if(userID != botID)
+						bot.sendMessage({to: channelID, message: "!slots " + userID,})
+					else
+						games.pSlots(args[0],channelID,mid)
+					break;
+                        
+                
                 case 'help':
                     bot.sendMessage({
                        to: channelID,
@@ -168,7 +191,7 @@ function sendEmbed(userID,channelID,isBan,amount){
  * @return boolean - true if the user has admin priviledge, false otherwise
  */
 function checkAdminPriviledge(userID){
-    let isAdmin = bot.servers[serverID].members[userID.toString()].roles.includes(adminRoleID);
+    isAdmin = bot.servers[serverID].members[userID.toString()].roles.includes(adminRoleID);
     return isAdmin;
 }
 
