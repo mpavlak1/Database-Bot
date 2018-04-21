@@ -541,6 +541,12 @@ function editMessage(c, mid, mess){
 	db_bot.bot.editMessage({channelID: c, messageID: mid, message: mess})	
 }
 
+function checkSlotWin(final,userID,channelID){
+	if(final[1] == true){
+		winGame(userID,channelID,10);
+	}
+}
+
 //Bot calls iteself with args of UserID
 //Returns print message to UI and repetedly edits it
 //Returns void
@@ -551,8 +557,8 @@ function editMessage(c, mid, mess){
  * @param {int} mid - message id to edit when 'spinning' the slot
  */
 function pSlots(userID,channelID,mid){
-	loseGame(userID,channelID,-1);
-	setTimeout(editMessage, 500);
+	
+	loseGame(userID,channelID,-1);		
 	s = slots();
 	for(i=0;i<10;i++){ //spin
 		s = slots();
@@ -562,12 +568,9 @@ function pSlots(userID,channelID,mid){
 					
 	final = slots();
 	m = "Slots for " + "<@!" + userID + ">\n"  +  printSlot(final[0]) + "\n";
-	setTimeout(editMessage, 3000); //will wait up to 3 seconds
-	editMessage(channelID,mid,m);
-		
-	if(final[1] == true){
-		winGame(userID,channelID,10);
-	}
+	
+	editMessage(channelID,mid,m)
+	checkSlotWin(final,userID,channelID);
 }
 
 // Phong's code begin

@@ -43,7 +43,7 @@ bot.on('message', function (user, userID, channelID, message, messageID, evt) {
 
 		// Our bot needs to know if it will execute a command
 		// It will listen for messages that will start with `!`
-		if (message.substring(0, 1) == '$') {
+		if (message.substring(0, 1) == '!') {
 			args = message.substring(1).split(' ');
 			cmd = args[0];
 			args = args.splice(1);
@@ -107,6 +107,7 @@ bot.on('message', function (user, userID, channelID, message, messageID, evt) {
 				case 'slots':
 					//When user calls, the bot will echo !slots with args = userID
 					//When the bot calls, will 'spin' the slots by editing the bot's message multiple times
+					setTimeout(games.pSlots,3000);
 					mid = messageID['d']['id'] //message ID used in editing
 					if(userID != botID)
 						bot.sendMessage({to: channelID, message: "!slots " + userID,})
