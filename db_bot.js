@@ -19,6 +19,15 @@ var database = require('./database_functions.js');
 var censor = require('./CensorReader.js');
 var games = require('./game.js');
 
+// Phong's code begin
+// arrays that hold all of the game instances
+var tGames = [];
+var cGames = [];
+var bGames = [];
+
+var boardSide = 3;
+var bBoardSide = 10;
+// Phong's code end
 
 botID = undefined
 bot.on('ready', function (evt) {
@@ -127,6 +136,47 @@ bot.on('message', function (user, userID, channelID, message, messageID, evt) {
                        }
                     });
                 break;
+		// Phong's code begin
+		case "pt":
+			let tGame = evalInstanceT(userID, channelID);
+			bot.sendMessage({
+				to: channelID,
+				message: "<@!" + userID + ">" + "'s TicTacToe Board:\n\n   " + "`"+printBoardT(tGame, userID)+"`",
+			});
+			break;
+		case "pc":
+			let cGame = evalInstanceC(userID, channelID);
+			bot.sendMessage({
+				to: channelID,
+				message: "<@!" + userID + ">" + "'s Connect-4 Board:\n\n " + "`"+printBoardC(cGame, userID)+"`",
+			});
+			break;
+		case "pb":
+			let bGame = evalInstanceB(userID, channelID);
+			bot.sendMessage({
+				to: channelID,
+				message: "<@!" + userID + ">" + "'s Blokus Board:\n\n   " + "`"+printBoardB(bGame, userID)+"`",
+			});
+			break;	
+		case 't':
+			bot.sendMessage({
+				to: channelID,
+				message: playTicTacToe(parseInt(args[0]), parseInt(args[1]), userID),
+			});
+			break;
+		case "c":
+			bot.sendMessage({
+				to: channelID,
+				message: playConnect4(parseInt(args[0]), userID),
+			});
+			break;
+		case "b":
+			bot.sendMessage({
+				to: channelID,
+				message: playBlokus(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), userID),
+			});
+			break;
+		// Phong's code end
                 default:
                     sendMessage(userID,channelID,"No command matching! Type !help for list of commands");
 				// Just add any case commands if you want to..
