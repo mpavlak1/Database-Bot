@@ -91,19 +91,27 @@ bot.on('message', function (user, userID, channelID, message, messageID, evt) {
                 break;
                 
                 case 'hangman':
+					//hangman is the high level function to start or continue a hangman game
+					//Takes args userID, channelID, and arg where args = any string/letter
+					//Invalid arguments are handeled within this function (will return string of error message if invalid)
 					bot.sendMessage({to: channelID, message: games.hangman(userID,args,channelID),});
 					break;
 				
 				case '2048':
+					//p2024 is the high level function to start or continue a 2048 game. 
+					//Takes args userID, channelID, and args where args = 'up', 'down', 'left', or 'right'
+					//Invalid arguments are handeled within this function (will return string of error message if invalid)
 					bot.sendMessage({to: channelID, message: games.p2048(userID,args,channelID),});
 					break;
 				
 				case 'slots':
-					mid = messageID['d']['id']
+					//When user calls, the bot will echo !slots with args = userID
+					//When the bot calls, will 'spin' the slots by editing the bot's message multiple times
+					mid = messageID['d']['id'] //message ID used in editing
 					if(userID != botID)
 						bot.sendMessage({to: channelID, message: "!slots " + userID,})
 					else
-						games.pSlots(args[0],channelID,mid)
+						games.pSlots(args[0],channelID,mid) //high level slot game function call
 					break;
                         
                 
