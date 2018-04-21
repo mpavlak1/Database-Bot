@@ -7,6 +7,13 @@ var db_bot = require('./db_bot.js');
 //Structure containing all needed data structures for game implentations
 //Key = game_type+UserID (string concat) 
 var games_data = {};
+var tGames = [];
+var cGames = [];
+var bGames = [];
+
+var boardSide = 3;
+var bBoardSide = 10;
+
 
 //Calls functions to update the DB
 /**
@@ -617,7 +624,8 @@ function isInt(value){
  * @param {array} arr - the array being cloned
  */
 function arrayClone(arr){
-    let i, copy;
+    i = undefined;
+    copy = undefined;
     if( Array.isArray( arr ) ) {
         copy = arr.slice( 0 );
         for( i = 0; i < copy.length; i++ ) {
@@ -635,7 +643,7 @@ function arrayClone(arr){
  * Prints a menu that displays all commands
  */
 function printCommandTable(){
-	let command = "`$help				    -print out all commands\n" +
+	command = "`$help				    -print out all commands\n" +
 				  "$t <row> <col>		    -mark x at row/column on tictactoe board\n" +
 				  "$c <col>				    -drop x on column on the connect4 board\n" +
 				  "$b <block> <row> <col>   -place a block's pin to row/column\n" +
@@ -645,6 +653,25 @@ function printCommandTable(){
 	return command;
 }
 //-------------------------------------------------------------------------------------------------------------
+// check if the game instance exists. If yes, access it
+// If no, create it and initalize members.
+function evalInstanceT(idCheck, channelID){
+	for(i = 0; i < tGames.length; i++){
+		if(tGames[i].id == idCheck){
+			return tGames[i];
+		}
+	}
+	tGame = {
+		id: idCheck,
+		type: "tictactoe",
+		board: [],
+		availableCells: []
+	}
+	initBoardT(tGame, idCheck, channelID);
+	tGames.push(tGame);
+	return tGame;
+}
+
 /**
  * Main function to launch Tic Tac Toe
  * @param {int} row - the row to mark at
@@ -657,16 +684,16 @@ function playTicTacToe(row, col, userID, channelID){
 		return "`Invalid Argument(s). Try again.`";
 	}
 
-	let tGame = evalInstanceT(userID, channelID);
+	tGame = evalInstanceT(userID, channelID);
 	if(row < 0 || row > boardSide-1 || col < 0 || col > boardSide-1 ||(tGame.board[row][col] != "")){
 		return "`Out of bound or cell not available. Try again.`";
 	}
 
 	// player move
 	tGame.board[row][col] = "x";
-	let index = checkItemInArrayT(tGame.availableCells,[row,col]);
+	index = checkItemInArrayT(tGame.availableCells,[row,col]);
 	tGame.availableCells.splice(index, 1);
-	let winnerString = checkIfWinnerT(tGame);
+	winnerString = checkIfWinnerT(tGame);
 	if(winnerString == "You just won!" || winnerString == "You just lost!" || winnerString == "Tie!"){
 		if(winnerString == "You just won!"){
 			// insertCreditBot(userID,channelID, 3);
@@ -676,8 +703,8 @@ function playTicTacToe(row, col, userID, channelID){
 	}
 
 	// bot move
-	let move = checkNextMoveT(tGame);
-	let indexOfCellToBeRemoved;
+	move = checkNextMoveT(tGame);
+	indexOfCellToBeRemoved = undefined;
 	if (move[0] == -1 && move[1] == -1){ // random move
 		indexOfCellToBeRemoved = Math.floor(Math.random() * tGame.availableCells.length);
 	} 
@@ -703,7 +730,7 @@ function checkIfWinnerT(tGame){
 	if(tGame.availableCells.length == 0){
 		return "Tie!"
 	}
-	let numWins = 0;
+	numWins = 0;
 	// horizontals
 	for(i = 0; i < boardSide; i++){
 		for(j = 0; j < boardSide; j++){
@@ -805,25 +832,6 @@ function checkItemInArrayT(array, item) {
     return -1;   // Not found
 }
 
-// check if the game instance exists. If yes, access it
-// If no, create it and initalize members.
-function evalInstanceT(idCheck, channelID){
-	for(i = 0; i < tGames.length; i++){
-		if(tGames[i].id == idCheck){
-			return tGames[i];
-		}
-	}
-	let tGame = {
-		id: idCheck,
-		type: "tictactoe",
-		board: [],
-		availableCells: []
-	}
-	initBoardT(tGame, idCheck, channelID);
-	tGames.push(tGame);
-	return tGame;
-}
-
 // initialize members in the game object
 function initBoardT(tGame, userID, channelID){
 	for(i = 0; i < boardSide; i++){
@@ -838,7 +846,7 @@ function initBoardT(tGame, userID, channelID){
 
 // display the board as a string
 function printBoardT(tGame, userID){
-	let boardString = "0 1 2 \n";
+	boardString = "0 1 2 \n";
 	for (i = 0; i < boardSide; i++) { 
 		boardString += i+"|";
     	for (j = 0; j < boardSide; j++) { 
@@ -862,13 +870,13 @@ function playConnect4(col, userID, channelID){
 	if (!isInt(col) || col < 0 || col > 6){
 		return "`Invalid Argument. Try again.`";
 	}
-	let cGame = evalInstanceC(userID, channelID);
+	cGame = evalInstanceC(userID, channelID);
 	if ((cGame.board[0][col] != "")){
 		return "`Column Full. Try again.`";
 	}
 
 	// player move
-	let row;
+	row = undefined;
 	for(i = 5; i >= 0; i--){
 		if(cGame.board[i][col] != "x" && cGame.board[i][col] != "o"){
 			cGame.board[i][col] = "x";
@@ -877,7 +885,7 @@ function playConnect4(col, userID, channelID){
 		} 
 	}
 	updateAvailableCols(cGame, col);
-	let winnerString = checkIfWinnerC(cGame, [row, col]);
+	winnerString = checkIfWinnerC(cGame, [row, col]);
 	if(winnerString == "You just won!" || winnerString == "You just lost!" || winnerString == "Tie!"){
 		if(winnerString == "You just won!"){
 			// insertCreditBot(userID,channelID, 6);
@@ -887,8 +895,8 @@ function playConnect4(col, userID, channelID){
 	}
 
 	// bot move
-	let move = checkNextMoveC(cGame);
-	let indexOfCellToBeRemoved;
+	move = checkNextMoveC(cGame);
+	indexOfCellToBeRemoved = undefined;
 	if (move[0] == -1 && move[1] == -1){ // random move
 		indexOfCellToBeRemoved = Math.floor(Math.random() * cGame.availableCols.length);
 	} 
@@ -932,15 +940,15 @@ function updateAvailableCols(cGame, col){
 function checkIfWinnerC(cGame, move){
 	if(cGame.availableCols.length == 0)
 		return "Tie!"
-	let numWins = 0;
-	let returnString;
-	let val = cGame.board[move[0]][move[1]];
+	numWins = 0;
+	returnString = undefined;
+	val = cGame.board[move[0]][move[1]];
 
 	if(val == "x") returnString = "You just won!";
 	else if(val == "o") returnString = "You just lost!";
 
 	// down
-	for(let i = move[0]; i < 6; i++){
+	for(i = move[0]; i < 6; i++){
 		if(cGame.board[i][move[1]] == val)
 			numWins++;
 		else
@@ -950,7 +958,7 @@ function checkIfWinnerC(cGame, move){
 	else numWins = 0;
 
 	// right and left
-	for(let j = move[1]; j < 7; j++){
+	for(j = move[1]; j < 7; j++){
 		if(cGame.board[move[0]][j] == val)
 			numWins++;
 		else
@@ -967,7 +975,7 @@ function checkIfWinnerC(cGame, move){
 	else numWins = 0;
 
 	// diagonals
-	let i = move[0]; let j = move[1];
+	i = move[0]; j = move[1];
 	while(i >= 0 && j < 7){ // top right
 		if(cGame.board[i][j] == val)
 			numWins++;
@@ -1061,7 +1069,7 @@ function evalInstanceC(idCheck, channelID){
 			return cGames[i];
 		}
 	}
-	let cGame = {
+	cGame = {
 		id: idCheck,
 		type: "connect4",
 		board: [],
@@ -1088,7 +1096,7 @@ function initBoardC(cGame, userId, channelID){
 
 // display the current board of the game
 function printBoardC(cGame, userID){
-	let boardString = "0 1 2 3 4 5 6 \n";
+	boardString = "0 1 2 3 4 5 6 \n";
 	for (i = 0; i < 6; i++) { 
 		boardString += "|";
     	for (j = 0; j < 7; j++) { 
@@ -1115,24 +1123,24 @@ function playBlokus(piece, row, col, userID, channelID){
 	if (!isInt(piece) || piece < 0 || piece > 15 || !isInt(row) || row < 0 || row > 15 || !isInt(col) || col < 0 || col > 15){
 		return "`Invalid Argument(s). Try again.`";
 	}
-	let bGame = evalInstanceB(userID, channelID);
+	bGame = evalInstanceB(userID, channelID);
 	if (bGame.board[row][col] != "" || !hasAtLeastOneDiagonal(bGame, [row,col], "x") || !isValidMove(bGame, bGame.availablePiecesX[piece], row, col, "x")){
 		return "Either the pieces' components are overlapping, the pieces are out of bounds, or the components are adjacent to other blocks. Try Again.";
 	}
 	//user move
-	let result;
+	result;
 	result = markPiece(bGame, bGame.availablePiecesX[piece], row, col, "x");
 
 	if(result == "N/A"){
 		return "Block already used. Try Again.";
 	}
 
-	let indexOfPiece1 = findPiece(bGame.availablePiecesXS, bGame.availablePiecesX[piece]);
+	indexOfPiece1 = findPiece(bGame.availablePiecesXS, bGame.availablePiecesX[piece]);
 	console.log("indexOfPiece1");
 	console.log(indexOfPiece1);
 	bGame.availablePiecesXS.splice(indexOfPiece1, 1);
 	bGame.availablePiecesX[piece] = "N/A"
-	let winnerString = checkIfWinnerB(bGame, "x");
+	winnerString = checkIfWinnerB(bGame, "x");
 	if(winnerString == "You just won!" || winnerString == "You just lost!"){
 		removeInstance(bGame);
 		if(winnerString == "You just won!"){
@@ -1142,20 +1150,20 @@ function playBlokus(piece, row, col, userID, channelID){
 	}
 
 	//bot move
-	let randomSpaceIndex  = Math.floor(Math.random() * bGame.availableCells.length);
-	let randomPieceAtRandomSpaceIndex = Math.floor(Math.random() * bGame.availablePiecesAtCell[randomSpaceIndex].length);
-	let piece2 = bGame.availablePiecesAtCell[randomSpaceIndex][randomPieceAtRandomSpaceIndex];
+	randomSpaceIndex  = Math.floor(Math.random() * bGame.availableCells.length);
+	randomPieceAtRandomSpaceIndex = Math.floor(Math.random() * bGame.availablePiecesAtCell[randomSpaceIndex].length);
+	piece2 = bGame.availablePiecesAtCell[randomSpaceIndex][randomPieceAtRandomSpaceIndex];
 	markPiece(bGame, piece2,
 		bGame.availableCells[randomSpaceIndex][0], 
 		bGame.availableCells[randomSpaceIndex][1],"o");
-	let indexOfPiece2 = findPiece(bGame.availablePiecesOS, piece2);
+	indexOfPiece2 = findPiece(bGame.availablePiecesOS, piece2);
 	
 	bGame.availableCells = [];
 	bGame.availablePiecesAtCell = [];
 	bGame.availablePiecesOS.splice(indexOfPiece2, 1);
 	bGame.availablePiecesO[randomPieceAtRandomSpaceIndex] = "N/A";	
 	winnerString = checkIfWinnerB(bGame, "o");
-	let arrayStr = displayArray(bGame);
+	arrayStr = displayArray(bGame);
 	bGame.availableCells = [];
 	bGame.availablePiecesAtCell = [];
 	if(winnerString == "You just won!" || winnerString == "You just lost!"){
@@ -1260,7 +1268,7 @@ function fillArrays(bGame, availablePieces, player){
 			if(bGame.board[a][b] != ""){
 				continue;
 			}	
-			let secondLayer = [];
+			secondLayer = [];
 			for(k = 0; k < availablePieces.length; k++){
 				if(hasAtLeastOneDiagonal(bGame, [a, b], player) && isValidMove(bGame, availablePieces[k], a, b, player)){
 					secondLayer.push(availablePieces[k]);
@@ -1278,7 +1286,7 @@ function fillArrays(bGame, availablePieces, player){
 
 // displays all the elements in an array
 function displayArray(bGame){
-	let arrayStr = "Cells available for move: {";
+	arrayStr = "Cells available for move: {";
 	for (i = 0; i < bGame.availableCells.length; i++){
 		arrayStr += "(" + bGame.availableCells[i][0] + ", " + bGame.availableCells[i][1] + ")"; 
 	}
@@ -1312,7 +1320,7 @@ function evalInstanceB(idCheck, channelID){
 			return bGames[i];
 		}
 	}
-	let bGame = {
+	bGame = {
 		id: idCheck,
 		type: "blokus",
 		board: [],
@@ -1344,7 +1352,7 @@ function initBoardB(bGame, userID, channelID){
 
 // display the current board of the game
 function printBoardB(bGame, userID){
-	let boardString = "0 1 2 3 4 5 6 7 8 9 \n";
+	boardString = "0 1 2 3 4 5 6 7 8 9 \n";
 	for (i = 0; i < bBoardSide; i++) { 
 		boardString += i + "|";
     	for (j = 0; j < bBoardSide; j++) { 
@@ -1363,7 +1371,7 @@ function printBoardB(bGame, userID){
 
 // displays each pieces individually
 function printPieces(availablePiecesS, whose){
-	let piecesString = whose + " availablePieces: "
+	piecesString = whose + " availablePieces: "
 	for(i = 0; i < availablePiecesS.length; i++){
 		if(i == availablePiecesS.length-1){
 			piecesString += availablePiecesS[i][0];
@@ -1376,7 +1384,7 @@ function printPieces(availablePiecesS, whose){
 }
 
 // sample piece set for the player playing blokus
-let pieces1 = [
+pieces1 = [
 	[0,[0,0]],								// 0
 	[1,[0,0],[0,1]],						// 1
 	[2,[0,0],[0,1],[1,1]],					// 2
@@ -1396,7 +1404,7 @@ let pieces1 = [
 ];
 
 // sample piece set for the cpu playing blokus
-let pieces2 = [
+pieces2 = [
 	[0,[0,0]],									// 0
 	[1,[0,0],[0,-1]],							// 1
 	[2,[0,0],[0,-1],[1,0]],						// 2
@@ -1425,6 +1433,7 @@ module.exports = {
 	hangman : hangman,
 	pSlots : pSlots,
 	p2048 : p2048,
+
 	// Phong's code begin
 	removeInstance: removeInstance,
 	isInt: isInt,

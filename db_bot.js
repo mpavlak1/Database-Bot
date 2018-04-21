@@ -13,21 +13,12 @@ module.exports = {
     sendEmbed: sendEmbed,
     bot: bot,
     serverID: serverID,
-    checkAdmin: checkAdminPriviledge
+    checkAdmin: checkAdminPriviledge,
 };
+
 var database = require('./database_functions.js');
 var censor = require('./CensorReader.js');
 var games = require('./game.js');
-
-// Phong's code begin
-// arrays that hold all of the game instances
-var tGames = [];
-var cGames = [];
-var bGames = [];
-
-var boardSide = 3;
-var bBoardSide = 10;
-// Phong's code end
 
 botID = undefined
 bot.on('ready', function (evt) {
@@ -52,7 +43,7 @@ bot.on('message', function (user, userID, channelID, message, messageID, evt) {
 
 		// Our bot needs to know if it will execute a command
 		// It will listen for messages that will start with `!`
-		if (message.substring(0, 1) == '!') {
+		if (message.substring(0, 1) == '$') {
 			args = message.substring(1).split(' ');
 			cmd = args[0];
 			args = args.splice(1);
@@ -138,42 +129,42 @@ bot.on('message', function (user, userID, channelID, message, messageID, evt) {
                 break;
 		// Phong's code begin
 		case "pt":
-			let tGame = evalInstanceT(userID, channelID);
+			tGame = games.evalInstanceT(userID, channelID);
 			bot.sendMessage({
 				to: channelID,
-				message: "<@!" + userID + ">" + "'s TicTacToe Board:\n\n   " + "`"+printBoardT(tGame, userID)+"`",
+				message: "<@!" + userID + ">" + "'s TicTacToe Board:\n\n   " + "`"+games.printBoardT(tGame, userID)+"`",
 			});
 			break;
 		case "pc":
-			let cGame = evalInstanceC(userID, channelID);
+			cGame = games.evalInstanceC(userID, channelID);
 			bot.sendMessage({
 				to: channelID,
-				message: "<@!" + userID + ">" + "'s Connect-4 Board:\n\n " + "`"+printBoardC(cGame, userID)+"`",
+				message: "<@!" + userID + ">" + "'s Connect-4 Board:\n\n " + "`"+games.printBoardC(cGame, userID)+"`",
 			});
 			break;
 		case "pb":
-			let bGame = evalInstanceB(userID, channelID);
+			bGame = games.evalInstanceB(userID, channelID);
 			bot.sendMessage({
 				to: channelID,
-				message: "<@!" + userID + ">" + "'s Blokus Board:\n\n   " + "`"+printBoardB(bGame, userID)+"`",
+				message: "<@!" + userID + ">" + "'s Blokus Board:\n\n   " + "`"+games.printBoardB(bGame, userID)+"`",
 			});
 			break;	
 		case 't':
 			bot.sendMessage({
 				to: channelID,
-				message: playTicTacToe(parseInt(args[0]), parseInt(args[1]), userID),
+				message: games.playTicTacToe(parseInt(args[0]), parseInt(args[1]), userID),
 			});
 			break;
 		case "c":
 			bot.sendMessage({
 				to: channelID,
-				message: playConnect4(parseInt(args[0]), userID),
+				message: games.playConnect4(parseInt(args[0]), userID),
 			});
 			break;
 		case "b":
 			bot.sendMessage({
 				to: channelID,
-				message: playBlokus(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), userID),
+				message: games.playBlokus(parseInt(args[0]), parseInt(args[1]), parseInt(args[2]), userID),
 			});
 			break;
 		// Phong's code end
