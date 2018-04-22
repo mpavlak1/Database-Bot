@@ -130,21 +130,21 @@ bot.on('message', function (user, userID, channelID, message, messageID, evt) {
                 break;
 		// Phong's code begin
 		case "pt":
-			tGame = games.evalInstanceT(userID, channelID);
+			let tGame = games.evalInstanceT(userID, channelID);
 			bot.sendMessage({
 				to: channelID,
 				message: "<@!" + userID + ">" + "'s TicTacToe Board:\n\n   " + "`"+games.printBoardT(tGame, userID)+"`",
 			});
 			break;
 		case "pc":
-			cGame = games.evalInstanceC(userID, channelID);
+			let cGame = games.evalInstanceC(userID, channelID);
 			bot.sendMessage({
 				to: channelID,
 				message: "<@!" + userID + ">" + "'s Connect-4 Board:\n\n " + "`"+games.printBoardC(cGame, userID)+"`",
 			});
 			break;
 		case "pb":
-			bGame = games.evalInstanceB(userID, channelID);
+			let bGame = games.evalInstanceB(userID, channelID);
 			bot.sendMessage({
 				to: channelID,
 				message: "<@!" + userID + ">" + "'s Blokus Board:\n\n   " + "`"+games.printBoardB(bGame, userID)+"`",
