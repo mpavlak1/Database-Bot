@@ -1,18 +1,18 @@
 const Discord = require('discord.io');
-var auth = require('./auth.json');
-var fs = require('fs');
-var database = require('./database_functions.js');
-var db_bot = require('./db_bot.js');
+let auth = require('./auth.json');
+let fs = require('fs');
+let database = require('./database_functions.js');
+let db_bot = require('./db_bot.js');
 
 //Structure containing all needed data structures for game implentations
 //Key = game_type+UserID (string concat) 
-var games_data = {};
-var tGames = [];
-var cGames = [];
-var bGames = [];
+let games_data = {};
+let tGames = [];
+let cGames = [];
+let bGames = [];
 
-var boardSide = 3;
-var bBoardSide = 10;
+let boardSide = 3;
+let bBoardSide = 10;
 
 
 //Calls functions to update the DB
