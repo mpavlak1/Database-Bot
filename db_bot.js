@@ -20,7 +20,7 @@ var database = require('./database_functions.js');
 var censor = require('./CensorReader.js');
 var games = require('./game.js');
 
-botID = undefined
+var botID = undefined
 bot.on('ready', function (evt) {
     console.log('Logged in as %s - %s\n', bot.username, bot.id);
 	botID = bot.id //used for slots, set botID on startup
@@ -108,7 +108,7 @@ bot.on('message', function (user, userID, channelID, message, messageID, evt) {
 					//When user calls, the bot will echo !slots with args = userID
 					//When the bot calls, will 'spin' the slots by editing the bot's message multiple times
 					setTimeout(games.pSlots,3000);
-					mid = messageID['d']['id'] //message ID used in editing
+					let mid = messageID['d']['id'] //message ID used in editing
 					if(userID != botID)
 						bot.sendMessage({to: channelID, message: "!slots " + userID,})
 					else

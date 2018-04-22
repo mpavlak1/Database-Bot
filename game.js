@@ -42,7 +42,7 @@ function loseGame(userID,channelID,amount){
 
 //Const for 2048
 //Transpose mapping for 4x4 Matrix 
-pairs = {};
+let pairs = {};
 pairs[2] = 5;
 pairs[3] = 9;
 pairs[4] = 13;
@@ -67,9 +67,9 @@ pairs[15] = 12;
 function startNew2048(userID,channelID){
 	
 	loseGame(userID,channelID,-1); //lose game subtracts credits when game is created.
-	userdata = {};
+	let userdata = {};
 	userdata["type"] = "2048";
-	board = {};
+	let board = {};
 	board[Math.floor(Math.random()*(16-1+1))+1] = 2; //set starting tile
 	userdata['board'] = board;
 	games_data["2048"+userID] = userdata;
@@ -85,7 +85,7 @@ function startNew2048(userID,channelID){
  * @return Returns board representation or error message if invalid move
  */
 function p2048(userID, args,channelID){
-	r = "";
+	let r = "";
 	if(games_data["2048"+userID] == undefined){
 		r = startNew2048(userID,channelID);
 	}else{
@@ -107,10 +107,10 @@ function p2048(userID, args,channelID){
  */
 function update2048(userID, dir, channelID){
 	
-	userdata = games_data["2048"+userID];
-	board = userdata['board'];
+	let userdata = games_data["2048"+userID];
+	let board = userdata['board'];
 	
-	valid = false;
+	let valid = false;
 	if((dir == 'up' | dir == 'down' | dir == 'right' | dir == 'left')){
 		valid = true;
 	}
@@ -119,12 +119,12 @@ function update2048(userID, dir, channelID){
 		return "Invalid Direction. Options: up, down, right, or left.\n\n" + printBoard(board);
 	}
 	
-	newBoard = collapse(dir, board);
-	for(i=0;i<3;i++)
+	let newBoard = collapse(dir, board);
+	for(let i=0;i<3;i++)
 		newBoard = collapse(dir, newBoard);
 	
 	//Get game status, true -> win, false -> loss, map -> valid game
-	check = checkBoard(newBoard);
+	let check = checkBoard(newBoard);
 	
 	//Check if win condition
 	if(check == true){
@@ -142,7 +142,7 @@ function update2048(userID, dir, channelID){
 	if(true || board != newBoard){
 		
 		//Add new tile to random empty space (2 or 4)	
-		index = check[Math.floor(Math.random()*(check.length+1))];
+		let index = check[Math.floor(Math.random()*(check.length+1))];
 		if(Math.floor(Math.random()*(11)) > 5){
 			newBoard[index] = 2;
 		}else{
@@ -180,16 +180,16 @@ function intLength(k){
  * @return {String} Returns board representation
  */
 function printBoard(board){
-	max = 0;
-	for(i=1;i<=16;i++){
+	let max = 0;
+	for(let i=1;i<=16;i++){
 		if(board[i] > max){
 			max = board[i];
 		}
-	}m = intLength(max);
+	}let m = intLength(max);
 		
-	r = "```";
+	let r = "```";
 	r = "";
-	for(i=1;i<=16;i++){
+	for(let i=1;i<=16;i++){
 		if(board[i] == undefined){
 			r += "x"+" ".repeat(m);
 		}else{
@@ -214,9 +214,9 @@ function printBoard(board){
 function transpose(board){
 	//A -> A'
 	//[[1 2 3 4] [5 6 7 8] [9 10 11 12] [13 14 15 16]] -> [[1 5 9 13] [2 6 10 14] [3 7 11 15] [4 8 12 16]]
-	newBoard = {};
-	for(i=1;i<=16;i++){
-		j = getTrans(i);
+	let newBoard = {};
+	for(let i=1;i<=16;i++){
+		let j = getTrans(i);
 		
 		if(i==j){
 			newBoard[i] = board[j];
@@ -255,7 +255,8 @@ function collapse(dir, board){
 	
 	//Move right
 	if(dir == 'right'){
-		for(i=1;i<=16;i++){
+		let j = 0;
+		for(let i=1;i<=16;i++){
 			if(i%4 == 0)
 				continue;
 		
@@ -277,7 +278,7 @@ function collapse(dir, board){
 	}
 	
 	if(dir == 'left'){
-		for(i=16;i>=1;i--){
+		for(let i=16;i>=1;i--){
 			if(i%4 == 1)
 				continue;
 			
@@ -295,7 +296,7 @@ function collapse(dir, board){
 		}
 	}
 	
-	for(i=1;i<=16;i++){
+	for(let i=1;i<=16;i++){
 		if(isNaN(parseInt(board[i])))
 			board[i] = undefined;
 	}
@@ -312,8 +313,8 @@ function collapse(dir, board){
  * @return Returns new board or boolean
  */
 function checkBoard(board){
-	empty = []
-	for(i=1;i<=16;i++){
+	let empty = []
+	for(let i=1;i<=16;i++){
 		if(board[i] == 2048){
 			return true;
 		}else{
@@ -324,19 +325,19 @@ function checkBoard(board){
 	}
 	if(empty.length == 0){
 		//need to check if any final moves possible when full board
-		left = collapse('left',board)
+		let left = collapse('left',board)
 		if(left != board)
 			return empty; //can still move left
 		
-		right = collapse('right',board);
+		let right = collapse('right',board);
 		if(right != board)
 			return empty;
 			
-		up = collapse('up',board);
+		let up = collapse('up',board);
 		if(up != board)
 			return empty;
 			
-		down = collapse('down',board);
+		let down = collapse('down',board);
 		if(down != board)
 			return empty;
 		return false;
@@ -345,7 +346,7 @@ function checkBoard(board){
 
 //Given index (1-16), return the transpose index (4x4)
 function getTrans(i){
-	r = pairs[i];
+	let r = pairs[i];
 	if(r == undefined){
 		return i;
 	}return r
@@ -358,12 +359,12 @@ function getTrans(i){
  * @return Returns hangman map
  */
 function startNewHangman(userID,channelID){
-	words = fs.readFileSync("./words.txt", 'utf8').split('\n');
+	let words = fs.readFileSync("./words.txt", 'utf8').split('\n');
 	
 	loseGame(userID,channelID,-1); //subtract credits when game is created
 	
-	word = words[Math.floor(Math.random()*Math.floor(words.length)) - 1];
-	userdata = {};
+	let word = words[Math.floor(Math.random()*Math.floor(words.length)) - 1];
+	let userdata = {};
 	userdata["type"] = "hangman"; //game type
 	userdata["strikes"] = 0;
 	userdata["word"] = word;
@@ -388,17 +389,17 @@ function startNewHangman(userID,channelID){
  */
 function checkLetter(userID, letter, channelID){
 	
-	letter = letter.toString().toLowerCase().trim(); //fix bad inputs
+	let letter = letter.toString().toLowerCase().trim(); //fix bad inputs
 		
 	if(letter.length != 1){
 		return  "You did not entery a valid guess. Please guess a single letter.\n" +
 				"Current board : " + games_data[userID]['board'] + "\t(" + games_data[userID]['strikes'] + " strikes used)\n";
 	}
 	
-	userdata = games_data[userID];
+	let userdata = games_data[userID];
 		
-	validGuess = true;
-	for(i=0;i<userdata['letters_used'].length;i++){
+	let validGuess = true;
+	for(let i=0;i<userdata['letters_used'].length;i++){
 		if(userdata['letters_used'][i] == letter){
 			validGuess = false;
 			break;
@@ -432,9 +433,9 @@ function checkLetter(userID, letter, channelID){
 				"\nCurrent board : " + userdata['board'] + "\t(" + userdata['strikes'] + " strikes used)\n";
 	}else{
 		//Correct guess
-		w = userdata['word'];
-		newBoard = "";
-		for(i=0;i<w.length;i++){
+		let w = userdata['word'];
+		let newBoard = "";
+		for(let i=0;i<w.length;i++){
 			if(w[i] == letter){
 				newBoard += letter;
 			}else{
@@ -442,8 +443,8 @@ function checkLetter(userID, letter, channelID){
 			}
 		}
 		userdata['board'] = newBoard;
-		returnMessage = "Current board : " + userdata['board'] + "\t(" + userdata['strikes'] +  " strikes used)\n";
-		
+		let returnMessage = "Current board : " + userdata['board'] + "\t(" + userdata['strikes'] +  " strikes used)\n";
+				
 		//Game won
 		if(newBoard.valueOf() == w.valueOf()){
 			winGame(userID,channelID,5);
@@ -468,6 +469,7 @@ function checkLetter(userID, letter, channelID){
  @return Returns string of current hangman instance
  */
 function hangman(userID,letter,user,channelID){
+	let r = "";
 	if(games_data[userID] == undefined){
 		r = startNewHangman(userID,channelID);
 	}else{
@@ -482,14 +484,14 @@ function hangman(userID,letter,user,channelID){
  * Helper function for slot game
  */
 function slots(){
-	min = 1; max = 6;
-	board = {};
-	for(i=0;i<9;i++){
-		r = Math.floor(Math.random()*(max-min+1))+min;
+	let min = 1; let max = 6;
+	let board = {};
+	for(let i=0;i<9;i++){
+		let r = Math.floor(Math.random()*(max-min+1))+min;
 		board[i] = r;
 	}
 	
-	win = false;
+	let win = false;
 	if(board[0] == board[1] && board[1] == board[2]){
 		win = true;
 	}if(board[3] == board[4] && board[4] == board[5]){
@@ -505,8 +507,8 @@ function slots(){
  * @return Returns string represntation of slot instance
  */
 function printSlot(vals){
-	r = "";
-	for(k=0;k<9;k++){
+	let r = "";
+	for(let k=0;k<9;k++){
 		if(k%3 == 0){
 			r+="\n\n";
 		}r+=emoj(vals[k])+' ';
@@ -559,14 +561,15 @@ function checkSlotWin(final,userID,channelID){
 function pSlots(userID,channelID,mid){
 	
 	loseGame(userID,channelID,-1);		
-	s = slots();
-	for(i=0;i<10;i++){ //spin
-		s = slots();
+	let s = slots();
+	let m = ""
+	for(let i=0;i<10;i++){ //spin
+		let s = slots();
 		m = "Slots for " + "<@!" + userID + ">\n"  +  printSlot(s[0]) + "\n";
 		editMessage(channelID,mid,m);
 	}
 					
-	final = slots();
+	let final = slots();
 	m = "Slots for " + "<@!" + userID + ">\n"  +  printSlot(final[0]) + "\n";
 	
 	editMessage(channelID,mid,m)
